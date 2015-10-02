@@ -18,4 +18,4 @@ run: $(EXEC)
 	watch -d -t "./phonebook_orig && echo 3 > /proc/sys/vm/drop_caches && ./phonebook_opt"
 
 clean:
-	$(RM) $(EXEC) *.o perf.*
+	$(RM) $(EXEC) *.o perf.* 

@@ -7,3 +7,4 @@
 *.bak
 phonebook_opt
 phonebook_orig
+calculate.c

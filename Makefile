@@ -11,11 +11,11 @@ phonebook_orig: $(SRCS_common) phonebook_orig.c phonebook_orig.h
 		$(SRCS_common) $@.c
 
 phonebook_opt: $(SRCS_common) phonebook_opt.c phonebook_opt.h
-	$(CC) $(CFLAGS_common) -DIMPL="\"$@.h\"" -o $@ \
+	$(CC) $(CFLAGS_common) -DOPT -DIMPL="\"$@.h\"" -o $@ \
 		$(SRCS_common) $@.c
 
 run: $(EXEC)
-	watch -d -t ./phonebook_orig
+	watch -d -t "./phonebook_opt && ./phonebook_orig"
 
 clean:
 	$(RM) $(EXEC) *.o perf.*

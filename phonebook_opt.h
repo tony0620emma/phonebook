@@ -2,8 +2,9 @@
 #define _PHONEBOOK_H
 
 #define MAX_LAST_NAME_SIZE 16
+#define TABLE_SIZE 256
 
-/* original version */
+/* hash version */
 typedef struct __PHONE_BOOK_ENTRY {
     char lastName[MAX_LAST_NAME_SIZE];
     char firstName[16];
@@ -18,7 +19,15 @@ typedef struct __PHONE_BOOK_ENTRY {
     struct __PHONE_BOOK_ENTRY *pNext;
 } entry;
 
-entry *findName(char lastname[], entry *pHead);
-entry *append(char lastName[], entry *e);
+typedef struct __PHONE_BOOK_HASHTABLE {
+	int size;
+	entry **storage;
+} HashTable;
+
+HashTable *createHashTable(int size);
+void freeHashTable(HashTable *ht);
+
+entry *findName(HashTable *ht, char lastname[]);
+entry *append(HashTable *ht, char lastName[]);
 
 #endif

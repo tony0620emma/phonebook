@@ -15,7 +15,7 @@ phonebook_opt: $(SRCS_common) phonebook_opt.c phonebook_opt.h
 		$(SRCS_common) $@.c
 
 run: $(EXEC)
-	watch -d -t "./phonebook_opt && ./phonebook_orig"
+	watch -d -t "./phonebook_orig && echo 3 > /proc/sys/vm/drop_caches && ./phonebook_opt"
 
 clean:
 	$(RM) $(EXEC) *.o perf.*

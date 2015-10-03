@@ -94,13 +94,13 @@ int main(int argc, char *argv[])
 #else 
 	output = fopen("orig.txt", "a");
 #endif
-	fprintf(output, "%lf\n%lf\n", cpu_time1, cpu_time2);
+	fprintf(output, "append() findName() %lf %lf\n", cpu_time1, cpu_time2);
 	fclose(output);
 
     printf("execution time of append() : %lf sec\n", cpu_time1);
     printf("execution time of findName() : %lf sec\n", cpu_time2);
 
-    /* FIXME: release all allocated entries */
+    if (pHead->pNext) free(pHead->pNext);
     free(pHead);
 
 #if defined(OPT)

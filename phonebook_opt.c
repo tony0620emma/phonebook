@@ -91,12 +91,10 @@ entry *append(HashTable *ht, char lastName[])
 		return NULL;
 	entry *e;
 	if (ht->storage[key[0]]) {
-		entry *cur = ht->storage[key[0]];
-		while (cur->pNext) cur = cur->pNext;
 		e = malloc(sizeof(entry));
 		e->lastNameValue = key[1];
-		e->pNext = NULL;
-		cur->pNext = e;
+		e->pNext = ht->storage[key[0]]->pNext;
+		ht->storage[key[0]] = e;
 		free(key);
 		return e;
 	} else {

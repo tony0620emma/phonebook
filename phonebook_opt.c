@@ -64,7 +64,7 @@ entry *append(HashTable *ht, char lastName[])
 		e = malloc(sizeof(entry));
 		strcpy(e->lastName, lastName);
 		e->pNext = NULL;
-		ht->storage[key] = e;
+		cur->pNext = e;
 		return e;
 	} else {
 		e = malloc(sizeof(entry));

@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "phonebook_opt.h"
 
@@ -29,24 +30,53 @@ void freeHashTable(HashTable *ht)
 	free(ht);
 }
 
-int getHashKey(char *s, int size)
+int *getHashKey(char *s, int size, int *key)
 {
-	if (!s) return -1;
-	int hash = 0;
-	while(*s) {
-		hash += *s++ * 17;
+	if (!s) return NULL;
+	int hash, i, val;
+	for (hash = 0, i = 0, val = 1; *s != '\0'; i++, s++) {
+		hash = (hash<<4) ^ (hash>>28) ^ *s;
+		val = val * 31 + (*s - 'a');
 	}
-	return hash % size;
+
+	/* index 0 for the key
+	 * index 1 for the value
+	 * so we don't need strcpy */
+
+	key[0] = abs(hash % size);
+	key[1] = val;
+	return key;
+}
+
+char *valuetoName(int val, char *Name)
+{
+	int c, i = 0;
+	while (val != 1) {
+		c = val % 31;
+		val = (val - c) / 31;
+		Name[i++] = c + 'a';
+	}
+	Name[i] = '\0';
+	int j = 0, temp;
+	for (j = 0, --i; i > j; i--, j++) {
+		temp = Name[i];
+		Name[i] = Name[j];
+		Name[j] = temp;
+	}
+	return Name;
 }
 
 entry *findName(HashTable *ht, char lastName[])
 {
-    int key;
-	if ((key = getHashKey(lastName, ht->size)) == -1) return NULL;
+	int *key = malloc(sizeof(int) * 2);
+	key = getHashKey(lastName, ht->size, key);
+	if (key[0] == -1) 
+		return NULL;
 	entry *e;
-	if ((e = ht->storage[key])) {
+	if ((e = ht->storage[key[0]])) {
 		do {
-			if (strcasecmp(lastName, e->lastName) == 0) return e;
+			if (key[1] == e->lastNameValue) 
+					return e;
 			e = e->pNext;
 		} while (e);
 	}
@@ -55,22 +85,26 @@ entry *findName(HashTable *ht, char lastName[])
 
 entry *append(HashTable *ht, char lastName[])
 {
-	int key;
-	if ((key = getHashKey(lastName, ht->size)) == -1) return NULL;
+	int *key = malloc(sizeof(int) * 2);
+	key = getHashKey(lastName, ht->size, key);
+	if (key[0] == -1) 
+		return NULL;
 	entry *e;
-	if (ht->storage[key]) {
-		entry *cur = ht->storage[key];
+	if (ht->storage[key[0]]) {
+		entry *cur = ht->storage[key[0]];
 		while (cur->pNext) cur = cur->pNext;
 		e = malloc(sizeof(entry));
-		strcpy(e->lastName, lastName);
+		e->lastNameValue = key[1];
 		e->pNext = NULL;
 		cur->pNext = e;
+		free(key);
 		return e;
 	} else {
 		e = malloc(sizeof(entry));
-		strcpy(e->lastName, lastName);
+		e->lastNameValue = key[1];
 		e->pNext = NULL;
-		ht->storage[key] = e;
+		ht->storage[key[0]] = e;
+		free(key);
 		return e;
 	}
 }

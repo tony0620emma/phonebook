@@ -6,6 +6,7 @@
 
 /* hash version */
 typedef struct __PHONE_BOOK_ENTRY {
+	int lastNameValue;
     char lastName[MAX_LAST_NAME_SIZE];
     char firstName[16];
     char email[16];
@@ -26,6 +27,8 @@ typedef struct __PHONE_BOOK_HASHTABLE {
 
 HashTable *createHashTable(int size);
 void freeHashTable(HashTable *ht);
+int *getHashKey(char *s, int size, int *key);
+char *valuetoName(int val, char *result);
 
 entry *findName(HashTable *ht, char lastname[]);
 entry *append(HashTable *ht, char lastName[]);

@@ -75,17 +75,18 @@ entry *findName(HashTable *ht, char lastName[])
 	entry *e;
 	if ((e = ht->storage[key[0]])) {
 		do {
-			if (key[1] == e->lastNameValue) 
-					return e;
+			if (key[1] == e->lastNameValue) {
+				free(key);
+				return e;
+			} 
 			e = e->pNext;
 		} while (e);
 	}
 	return NULL;
 }
 
-entry *append(HashTable *ht, char lastName[])
+entry *append(HashTable *ht, char lastName[], int *key)
 {
-	int *key = malloc(sizeof(int) * 2);
 	key = getHashKey(lastName, ht->size, key);
 	if (key[0] == -1) 
 		return NULL;
@@ -95,14 +96,12 @@ entry *append(HashTable *ht, char lastName[])
 		e->lastNameValue = key[1];
 		e->pNext = ht->storage[key[0]]->pNext;
 		ht->storage[key[0]] = e;
-		free(key);
 		return e;
 	} else {
 		e = malloc(sizeof(entry));
 		e->lastNameValue = key[1];
 		e->pNext = NULL;
 		ht->storage[key[0]] = e;
-		free(key);
 		return e;
 	}
 }

@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
 
 #if defined(OPT)
 	HashTable *ht = createHashTable(TABLE_SIZE);
+	int *key = malloc(sizeof(int) * 2);
 #endif
 	while (fgets(line, sizeof(line), fp)) {
 		while (line[i] != '\0')
@@ -58,9 +59,9 @@ int main(int argc, char *argv[])
 		line[i - 1] = '\0';
 		i = 0;
 #if defined(OPT)
-	e = append(ht, line);
+		e = append(ht, line, key);
 #else
-        e = append(line, e);
+        	e = append(line, e);
 #endif
 	}
 	clock_gettime(CLOCK_REALTIME, &end);
@@ -88,11 +89,13 @@ int main(int argc, char *argv[])
 #endif
 	/* compute the execution time */
 	clock_gettime(CLOCK_REALTIME, &start);
+	for (i = 0; i < 10; i++) {
 #if defined(OPT)
-	findName(ht, input);
+		findName(ht, input);
 #else
-	findName(input, e);
+		findName(input, e);
 #endif
+	}
    	clock_gettime(CLOCK_REALTIME, &end);
 	cpu_time2 = diff_in_second(start, end);
 	FILE *output;
@@ -115,6 +118,7 @@ int main(int argc, char *argv[])
 
 #if defined(OPT)
 	freeHashTable(ht);
+	free(key);
 #endif
 
 	return 0;

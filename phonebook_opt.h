@@ -31,6 +31,6 @@ int *getHashKey(char *s, int size, int *key);
 char *valuetoName(int val, char *result);
 
 entry *findName(HashTable *ht, char lastname[]);
-entry *append(HashTable *ht, char lastName[]);
+entry *append(HashTable *ht, char lastName[], int *key);
 
 #endif

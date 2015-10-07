@@ -94,7 +94,7 @@ entry *append(HashTable *ht, char lastName[], int *key)
     if (ht->storage[key[0]]) {
         e = malloc(sizeof(entry));
         e->lastNameValue = key[1];
-        e->pNext = ht->storage[key[0]]->pNext;
+        e->pNext = ht->storage[key[0]];
         ht->storage[key[0]] = e;
         return e;
     } else {

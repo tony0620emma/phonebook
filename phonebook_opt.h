@@ -1,5 +1,6 @@
 #ifndef _PHONEBOOK_H
 #define _PHONEBOOK_H
+#include <stdio.h>
 
 #define MAX_LAST_NAME_SIZE 16
 #define TABLE_SIZE 65536
@@ -25,12 +26,17 @@ typedef struct __PHONE_BOOK_HASHTABLE {
     entry **storage;
 } HashTable;
 
+typedef struct _thread_data_t {
+    int *key;
+    FILE *fp;
+    HashTable *ht;
+} thread_data_t;
 HashTable *createHashTable(int size);
 void freeHashTable(HashTable *ht);
 int *getHashKey(char *s, int size, int *key);
 char *valuetoName(int val, char *result);
 
 entry *findName(HashTable *ht, char lastname[]);
-entry *append(HashTable *ht, char lastName[], int *key);
+void *append_thread(void *arguments);
 
 #endif

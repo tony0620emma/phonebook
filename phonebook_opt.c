@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <pthread.h>
 
 #include "phonebook_opt.h"
 
@@ -85,23 +86,51 @@ entry *findName(HashTable *ht, char lastName[])
     return NULL;
 }
 
-entry *append(HashTable *ht, char lastName[], int *key)
+pthread_mutex_t hash_lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t file_lock = PTHREAD_MUTEX_INITIALIZER;
+int done = 0;
+
+void *append_thread(void *arguments)
 {
-    key = getHashKey(lastName, ht->size, key);
-    if (key[0] == -1)
-        return NULL;
-    entry *e;
-    if (ht->storage[key[0]]) {
-        e = malloc(sizeof(entry));
-        e->lastNameValue = key[1];
-        e->pNext = ht->storage[key[0]];
-        ht->storage[key[0]] = e;
-        return e;
-    } else {
-        e = malloc(sizeof(entry));
-        e->lastNameValue = key[1];
-        e->pNext = NULL;
-        ht->storage[key[0]] = e;
-        return e;
+    thread_data_t *data = (thread_data_t *) arguments;
+    int i = 0;
+    int *key = data->key;
+    FILE *fp = data->fp;
+    HashTable *ht = data->ht;
+    char line[MAX_LAST_NAME_SIZE];
+
+    while (1) {
+        pthread_mutex_lock(&file_lock);
+        if(!fgets(line, sizeof(line), fp)) break;
+        pthread_mutex_unlock(&file_lock);
+
+        while (line[i] != '\0')
+            i++;
+        line[i - 1] = '\0';
+        i = 0;
+
+	printf("%s\n", line);
+        key = getHashKey(line, ht->size, key);
+        if (key[0] == -1)
+            return NULL;
+        entry *e;
+        if (ht->storage[key[0]]) {
+            e = malloc(sizeof(entry));
+            e->lastNameValue = key[1];
+
+            pthread_mutex_lock(&hash_lock);
+            e->pNext = ht->storage[key[0]];
+            ht->storage[key[0]] = e;
+            pthread_mutex_unlock(&hash_lock);
+        } else {
+            e = malloc(sizeof(entry));
+            e->lastNameValue = key[1];
+            e->pNext = NULL;
+
+            pthread_mutex_lock(&hash_lock);
+            ht->storage[key[0]] = e;
+            pthread_mutex_unlock(&hash_lock);
+        }
     }
+    pthread_exit(NULL);
 }

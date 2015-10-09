@@ -1,5 +1,5 @@
 CC ?= gcc
-CFLAGS_common ?= -O0 -Wall -std=gnu99
+CFLAGS_common ?= -O0 -Wall -std=gnu99 -pthread
 
 EXEC = phonebook_orig phonebook_opt
 all: $(EXEC)

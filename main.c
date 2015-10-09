@@ -3,10 +3,14 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include <pthread.h>
 
 #include IMPL
 
 #define DICT_FILE "./dictionary/words.txt"
+#define NUM_THREADS 2
+
+extern int done;
 
 static double diff_in_second(struct timespec t1, struct timespec t2)
 {
@@ -25,7 +29,6 @@ int main(int argc, char *argv[])
 {
     FILE *fp;
     int i = 0;
-    char line[MAX_LAST_NAME_SIZE];
     struct timespec start, end;
     double cpu_time1, cpu_time2;
 
@@ -51,19 +54,30 @@ int main(int argc, char *argv[])
 
 #if defined(OPT)
     HashTable *ht = createHashTable(TABLE_SIZE);
-    int *key = malloc(sizeof(int) * 2);
-#endif
+    thread_data_t thr_data[NUM_THREADS];
+    pthread_t thr[NUM_THREADS];
+    for (i = 0; i < NUM_THREADS; i++) {
+        thr_data[i].ht = ht;
+        thr_data[i].fp = fp;
+        thr_data[i].key = malloc(sizeof(int) * 2);
+        if(pthread_create(&thr[i], NULL, append_thread, &thr_data[i])) {
+		fprintf(stderr, "error: pthread_create\n");
+		return EXIT_FAILURE;
+	}
+    }
+    while (!done);
+    printf("It's done!!\n");
+#else
+    char line[MAX_LAST_NAME_SIZE];
     while (fgets(line, sizeof(line), fp)) {
         while (line[i] != '\0')
             i++;
         line[i - 1] = '\0';
         i = 0;
-#if defined(OPT)
-        e = append(ht, line, key);
-#else
         e = append(line, e);
-#endif
     }
+#endif
+
     clock_gettime(CLOCK_REALTIME, &end);
     cpu_time1 = diff_in_second(start, end);
 
@@ -118,7 +132,9 @@ int main(int argc, char *argv[])
 
 #if defined(OPT)
     freeHashTable(ht);
-    free(key);
+    for (i = 0; i < NUM_THREADS; i++) {
+    	free(thr_data[i].key);	
+    }
 #endif
 
     return 0;

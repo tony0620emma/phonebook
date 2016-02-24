@@ -21,7 +21,11 @@ cache-test: phonebook_orig phonebook_opt
 	perf stat --repeat 100 -e cache-misses,cache-references,instructions,cycles ./phonebook_orig
 	perf stat --repeat 100 -e cache-misses,cache-references,instructions,cycles ./phonebook_opt
 	
-.PHONY: calculate clean
+.PHONY: calculate clean plot
+
+plot:
+	gnuplot plot.gp
+	eog run-time.png
 
 calculate: calculate.c
 	$(CC) $^ -o $@

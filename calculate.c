@@ -43,5 +43,6 @@ int main(void)
     fprintf(output, "findName() %lf %lf", orig_sum_f / 100.0, opt_sum_f / 100.0);
     fclose(output);
     fclose(fp);
+    printf("\nFinish calculating, run 'make plot' to see the result\n\n");
     return 0;
 }

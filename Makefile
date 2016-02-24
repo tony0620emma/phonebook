@@ -20,6 +20,13 @@ run: $(EXEC)
 cache-test: phonebook_orig phonebook_opt
 	perf stat --repeat 100 -e cache-misses,cache-references,instructions,cycles ./phonebook_orig
 	perf stat --repeat 100 -e cache-misses,cache-references,instructions,cycles ./phonebook_opt
+	
+.PHONY: calculate clean
+
+calculate: calculate.c
+	$(CC) $^ -o $@
+	./$@
+	rm -f $@
 
 clean:
 	$(RM) $(EXEC) *.o perf.* *.txt
